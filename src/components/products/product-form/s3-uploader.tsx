@@ -1,19 +1,38 @@
-import { api } from "@/lib/http";
+"use client";
 
-type PresignRes = { uploadUrl: string; key: string; publicUrl: string };
+import { useState } from "react";
+import { uploadToS3 } from "@/lib/s3-upload";
+import { toast } from "sonner";
 
-export async function uploadToS3(file: File) {
-  const presign = await api<PresignRes>("/api/uploads/presign", {
-    method: "POST",
-    body: JSON.stringify({ fileName: file.name, fileType: file.type, folder: "products" }),
-  });
+export function S3Uploader({ onUploaded }: { onUploaded: (img: { url: string; key: string }) => void }) {
+  const [loading, setLoading] = useState(false);
 
-  const put = await fetch(presign.uploadUrl, {
-    method: "PUT",
-    headers: { "Content-Type": file.type },
-    body: file,
-  });
+  return (
+    <div className="rounded-md border p-3">
+      <div className="text-sm font-medium">Upload image</div>
+      <p className="text-xs text-muted-foreground">Secure upload via presigned S3 URL.</p>
 
-  if (!put.ok) throw new Error("S3 upload failed");
-  return { url: presign.publicUrl, key: presign.key };
+      <input
+        className="mt-2 block w-full text-sm"
+        type="file"
+        accept="image/*"
+        disabled={loading}
+        onChange={async (e) => {
+          const f = e.target.files?.[0];
+          if (!f) return;
+          setLoading(true);
+          try {
+            const img = await uploadToS3(f);
+            onUploaded(img);
+            toast.success("Uploaded");
+          } catch (err: any) {
+            toast.error(err?.message ?? "Upload failed");
+          } finally {
+            setLoading(false);
+            e.target.value = "";
+          }
+        }}
+      />
+    </div>
+  );
 }

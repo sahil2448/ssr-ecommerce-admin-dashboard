@@ -12,35 +12,64 @@ function badId(id: string) {
   return !mongoose.Types.ObjectId.isValid(id);
 }
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
-  if (badId(params.id)) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+export async function GET(
+  _: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params; // Await params [web:171][web:172]
+  if (badId(id)) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   await connectDB();
 
-  const product = await Product.findById(params.id).lean();
+  const product = await Product.findById(id).lean();
   if (!product) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   return NextResponse.json(product);
 }
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
-  if (badId(params.id)) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params; // Await params [web:171][web:172]
+  if (badId(id)) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   await connectDB();
+
+  const existing = await Product.findById(id).lean();
+  if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
   const parsed = UpdateProductSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
-  const updated = await Product.findByIdAndUpdate(params.id, parsed.data, { new: true }).lean();
-  if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  // If images are included in PATCH, delete removed keys from S3
+  if (parsed.data.images) {
+    const prevKeys = new Set((existing.images ?? []).map((i: any) => i.key));
+    const nextKeys = new Set((parsed.data.images ?? []).map((i: any) => i.key));
+    const removedKeys = [...prevKeys].filter((k) => !nextKeys.has(k));
 
+    if (removedKeys.length > 0) {
+      await s3.send(
+        new DeleteObjectsCommand({
+          Bucket: AWS_S3_BUCKET,
+          Delete: { Objects: removedKeys.map((Key) => ({ Key })) },
+        })
+      );
+    }
+  }
+
+  const updated = await Product.findByIdAndUpdate(id, parsed.data, { new: true }).lean();
   return NextResponse.json(updated);
 }
 
-export async function DELETE(_: Request, { params }: { params: { id: string } }) {
-  if (badId(params.id)) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
+export async function DELETE(
+  _: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params; // Await params [web:171][web:172]
+  if (badId(id)) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   await connectDB();
 
-  const deleted = await Product.findByIdAndDelete(params.id).lean();
+  const deleted = await Product.findByIdAndDelete(id).lean();
   if (!deleted) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const keys = (deleted.images ?? []).map((img: any) => img?.key).filter(Boolean);

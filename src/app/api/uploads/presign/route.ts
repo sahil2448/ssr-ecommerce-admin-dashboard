@@ -9,7 +9,7 @@ import { s3, AWS_REGION, AWS_S3_BUCKET } from "@/lib/s3";
 
 const PresignSchema = z.object({
   fileName: z.string().min(1),
-  fileType: z.string().min(1), // e.g. image/png
+  fileType: z.string().min(1),
   folder: z.string().optional().default("products"),
 });
 
@@ -31,9 +31,16 @@ export async function POST(req: Request) {
     Bucket: AWS_S3_BUCKET,
     Key: key,
     ContentType: fileType,
+    // Disable automatic checksum to avoid signature mismatch
+    ChecksumAlgorithm: undefined,
   });
 
-  const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 60 * 5 });
+  // Sign without checksum parameters
+  const uploadUrl = await getSignedUrl(s3, command, { 
+    expiresIn: 60 * 5,
+    unhoistableHeaders: new Set(["x-amz-checksum-crc32"]),
+  });
+
   const publicUrl = `https://${AWS_S3_BUCKET}.s3.${AWS_REGION}.amazonaws.com/${key}`;
 
   return NextResponse.json({ uploadUrl, key, publicUrl });

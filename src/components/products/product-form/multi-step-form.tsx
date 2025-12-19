@@ -1,23 +1,34 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { api } from "@/lib/http";
 import { uploadToS3 } from "@/lib/s3-upload";
-import { CreateProductSchema } from "@/lib/validators/product";
+import { CreateProductSchema, UpdateProductSchema } from "@/lib/validators/product";
 import type { z } from "zod";
 import { StepBasics, StepPricing, StepImagesReview } from "./steps";
+import { useApiSWR } from "@/lib/swr";
 
-type FormValues = z.infer<typeof CreateProductSchema>;
+type CreateValues = z.infer<typeof CreateProductSchema>;
+type Product = CreateValues & { _id: string };
 
-export function MultiStepProductForm({ mode }: { mode: "create" | "edit" }) {
+export function MultiStepProductForm({
+  mode,
+  productId,
+}: {
+  mode: "create" | "edit";
+  productId?: string;
+}) {
   const router = useRouter();
   const [step, setStep] = useState(0);
 
-  const form = useForm<FormValues>({
+  const shouldLoad = mode === "edit" && !!productId;
+  const { data: product, isLoading } = useApiSWR<Product>(shouldLoad ? `/api/products/${productId}` : null);
+
+  const form = useForm<CreateValues>({
     resolver: zodResolver(CreateProductSchema),
     defaultValues: {
       name: "",
@@ -31,6 +42,22 @@ export function MultiStepProductForm({ mode }: { mode: "create" | "edit" }) {
     },
     mode: "onChange",
   });
+
+  // Prefill when product loads
+  useEffect(() => {
+    if (mode === "edit" && product) {
+      form.reset({
+        name: product.name,
+        description: product.description,
+        category: product.category,
+        price: product.price,
+        stock: product.stock,
+        sku: product.sku,
+        images: product.images ?? [],
+        isActive: product.isActive ?? true,
+      });
+    }
+  }, [mode, product, form]);
 
   const steps = useMemo(
     () => [
@@ -51,12 +78,33 @@ export function MultiStepProductForm({ mode }: { mode: "create" | "edit" }) {
   function back() {
     setStep((s) => Math.max(s - 1, 0));
   }
+async function onSubmit(values: CreateValues) {
+  try {
+    if (mode === "create") {
+      await api("/api/products", { method: "POST", body: JSON.stringify(values) });
+      toast.success("Product created");
+      router.push("/admin/products");
+      router.refresh();
+      return;
+    }
 
-  async function onSubmit(values: FormValues) {
-    await api("/api/products", { method: "POST", body: JSON.stringify(values) });
-    toast.success("Product created");
+    // edit mode: send all values (backend UpdateProductSchema will validate)
+    await api(`/api/products/${productId}`, { 
+      method: "PATCH", 
+      body: JSON.stringify(values) 
+    });
+    toast.success("Product updated");
     router.push("/admin/products");
     router.refresh();
+  } catch (error: any) {
+    toast.error(error?.message ?? "Failed to save product");
+    console.error("Save error:", error);
+  }
+}
+
+
+  if (mode === "edit" && isLoading) {
+    return <div className="text-sm text-muted-foreground">Loading product…</div>;
   }
 
   return (
@@ -74,14 +122,14 @@ export function MultiStepProductForm({ mode }: { mode: "create" | "edit" }) {
           <StepImagesReview
             form={form}
             onUpload={async (file) => {
-              const img = await uploadToS3(file);
+              const img = await uploadToS3(file); // presigned PUT flow [web:148][web:150]
               const prev = form.getValues("images");
               form.setValue("images", [...prev, img], { shouldValidate: true });
               toast.success("Image uploaded");
             }}
             onRemove={(key) => {
-              const next = form.getValues("images").filter((i) => i.key !== key);
-              form.setValue("images", next, { shouldValidate: true });
+              const nextImgs = form.getValues("images").filter((i) => i.key !== key);
+              form.setValue("images", nextImgs, { shouldValidate: true });
             }}
           />
         )}
@@ -97,7 +145,7 @@ export function MultiStepProductForm({ mode }: { mode: "create" | "edit" }) {
             </button>
           ) : (
             <button type="submit" className="rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground">
-              Create product
+              {mode === "create" ? "Create product" : "Save changes"}
             </button>
           )}
         </div>
