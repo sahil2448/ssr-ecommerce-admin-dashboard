@@ -22,40 +22,47 @@ export default function SalesChartClient({ payload }: { payload: any }) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
-      <div className="rounded-lg border bg-card p-6">
+      <div className="rounded-lg border bg-card px-6 pt-6">
         <h3 className="text-sm font-semibold mb-4">Revenue Trend (Last 30 Days)</h3>
         <div style={{ width: "100%", height: "300px" }}>
           <ResponsiveContainer>
-            <LineChart data={daily} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
-              <XAxis 
-                dataKey="date" 
-                tick={{ fontSize: 11 }} 
-                angle={-45}
-                textAnchor="end"
-                height={60}
-              />
-              <YAxis tick={{ fontSize: 11 }} width={60} />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "hsl(var(--card))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "8px",
-                  fontSize: "12px",
-                }}
-                formatter={(value: any) => [`₹${value.toLocaleString()}`, "Revenue"]}
-              />
-              <Legend wrapperStyle={{ fontSize: "12px" }} />
-              <Line 
-                type="monotone" 
-                dataKey="revenue" 
-                stroke="hsl(var(--primary))" 
-                strokeWidth={3}
-                dot={{ r: 4, fill: "hsl(var(--primary))" }}
-                activeDot={{ r: 6 }}
-                name="Revenue"
-              />
-            </LineChart>
+            <LineChart data={daily} margin={{ top: 10, right: 20, left: 0, bottom: 20 }}>
+  <defs>
+    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+    </linearGradient>
+  </defs>
+  <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+  <XAxis 
+    dataKey="date" 
+    tick={{ fontSize: 11 }} 
+    angle={-45}
+    textAnchor="end"
+    height={70}
+  />
+  <YAxis tick={{ fontSize: 11 }} width={70} />
+  <Tooltip
+    contentStyle={{
+      backgroundColor: "hsl(var(--card))",
+      border: "1px solid hsl(var(--border))",
+      borderRadius: "8px",
+      fontSize: "12px",
+    }}
+    formatter={(value: any) => [`₹${value.toLocaleString()}`, "Revenue"]}
+  />
+  <Line 
+    type="monotone" 
+    dataKey="revenue" 
+          stroke="#3b82f6"
+    strokeWidth={2}
+    fill="url(#colorRevenue)"
+    dot={{ r: 3, fill: "hsl(var(--primary))", strokeWidth: 2, stroke: "#fff" }}
+    activeDot={{ r: 5, strokeWidth: 2 }}
+    connectNulls
+  />
+</LineChart>
+
           </ResponsiveContainer>
         </div>
       </div>
