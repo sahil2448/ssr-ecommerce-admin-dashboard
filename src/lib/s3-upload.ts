@@ -14,6 +14,11 @@ export async function uploadToS3(file: File) {
     body: file,
   });
 
-  if (!put.ok) throw new Error("S3 upload failed");
+  if (!put.ok) {
+    const text = await put.text().catch(() => "");
+    console.error("S3 PUT failed:", put.status, text);
+    throw new Error(`S3 upload failed (${put.status})`);
+  }
+
   return { url: presign.publicUrl, key: presign.key };
 }

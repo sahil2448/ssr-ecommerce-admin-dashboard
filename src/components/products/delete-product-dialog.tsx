@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Trash2 } from "lucide-react";
 
 export function DeleteProductDialog({
   productName,
@@ -14,23 +15,34 @@ export function DeleteProductDialog({
 
   return (
     <>
-      <button className="rounded-md border px-2 py-1 text-xs" onClick={() => setOpen(true)}>
+      <button
+        onClick={() => setOpen(true)}
+        className="inline-flex items-center gap-1.5 rounded-md border border-red-200 dark:border-red-800 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
+      >
+        <Trash2 className="h-3 w-3" />
         Delete
       </button>
+
       {open && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
-          <div className="w-full max-w-md rounded-lg bg-background p-4 shadow">
-            <div className="text-sm font-semibold">Delete product?</div>
-            <div className="mt-2 text-sm text-muted-foreground">
-              This will permanently delete <span className="font-medium">{productName}</span> and remove its images from S3.
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-lg bg-card p-6 shadow-xl border">
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold">Delete Product</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Are you sure you want to delete <span className="font-medium text-foreground">{productName}</span>?
+                This will permanently remove all images and data.
+              </p>
             </div>
-            <div className="mt-4 flex justify-end gap-2">
-              <button className="rounded-md border px-3 py-2 text-sm" onClick={() => setOpen(false)}>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setOpen(false)}
+                disabled={loading}
+                className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50 cursor-pointer"
+              >
                 Cancel
               </button>
               <button
-                className="rounded-md bg-destructive px-3 py-2 text-sm text-destructive-foreground"
-                disabled={loading}
                 onClick={async () => {
                   setLoading(true);
                   try {
@@ -40,8 +52,10 @@ export function DeleteProductDialog({
                     setLoading(false);
                   }
                 }}
+                disabled={loading}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors disabled:opacity-50 cursor-pointer"
               >
-                {loading ? "Deleting…" : "Delete"}
+                {loading ? "Deleting..." : "Delete Product"}
               </button>
             </div>
           </div>
