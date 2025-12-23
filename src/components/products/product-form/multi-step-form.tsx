@@ -72,7 +72,10 @@ export function MultiStepProductForm({
   async function next() {
     const fields = steps[step]!.fields as any;
     const ok = await form.trigger(fields);
-    if (!ok) return;
+    if (!ok) {
+      toast.error("Please fill all required fields");
+      return;
+    }
     setStep((s) => Math.min(s + 1, steps.length - 1));
   }
 
@@ -80,61 +83,70 @@ export function MultiStepProductForm({
     setStep((s) => Math.max(s - 1, 0));
   }
 
-  async function onSubmit(values: CreateValues) {
+  async function handleFinalSubmit() {
+    const values = form.getValues();
+    const isValid = await form.trigger();
+    
+    if (!isValid) {
+      toast.error("Please complete all required fields");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       if (mode === "create") {
         await api("/api/products", { method: "POST", body: JSON.stringify(values) });
         toast.success("Product created successfully");
-        router.push("/admin/products");
-        router.refresh();
-        return;
+      } else {
+        await api(`/api/products/${productId}`, { method: "PATCH", body: JSON.stringify(values) });
+        toast.success("Product updated successfully");
       }
-
-      await api(`/api/products/${productId}`, { method: "PATCH", body: JSON.stringify(values) });
-      toast.success("Product updated successfully");
+      
       router.push("/admin/products");
       router.refresh();
     } catch (error: any) {
       toast.error(error?.message ?? "Failed to save product");
-    } finally {
       setIsSubmitting(false);
     }
   }
 
   if (mode === "edit" && isLoading) {
-    return <div className="text-sm text-muted-foreground">Loading product...</div>;
+    return (
+      <div className="rounded-lg border bg-background shadow-sm p-6 max-w-3xl mx-auto">
+        <div className="text-sm text-muted-foreground">Loading product...</div>
+      </div>
+    );
   }
 
   return (
-<div className="rounded-lg border bg-background shadow-sm p-4 sm:p-6 max-w-3xl mx-auto">
-        <div className="mb-8">
-<div className="flex items-center justify-between mb-4 gap-3 overflow-x-auto">
+    <div className="rounded-lg border bg-background shadow-sm p-4 sm:p-6 max-w-3xl mx-auto">
+      <div className="mb-8">
+        <div className="flex items-center justify-center gap-2 sm:gap-4 max-w-2xl mx-auto">
           {steps.map((s, i) => (
-            <div key={i} className="flex items-center flex-1">
-              <div className="flex flex-col items-center">
+            <div key={i} className="flex items-center">
+              <div className="flex flex-col items-center min-w-0">
                 <div
-                  className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                  className={`h-10 w-10 shrink-0 rounded-full flex items-center justify-center text-sm font-medium transition-all ${
                     i < step
                       ? "bg-primary text-primary-foreground"
                       : i === step
-                      ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
+                      ? "bg-primary text-primary-foreground ring-4 ring-primary/20 scale-110"
                       : "bg-muted text-muted-foreground"
                   }`}
                 >
                   {i < step ? <Check className="h-5 w-5" /> : i + 1}
                 </div>
-                <div className="mt-2 text-xs font-medium text-center">{s.title}</div>
+                <div className="mt-2 text-xs font-medium text-center whitespace-nowrap">{s.title}</div>
               </div>
               {i < steps.length - 1 && (
-                <div className={`h-0.5 flex-1 mx-4 ${i < step ? "bg-primary" : "bg-muted"}`} />
+                <div className={`h-0.5 w-12 sm:w-20 mx-2 transition-colors ${i < step ? "bg-primary" : "bg-muted"}`} />
               )}
             </div>
           ))}
         </div>
       </div>
 
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <div className="space-y-6">
         {step === 0 && <StepBasics form={form} />}
         {step === 1 && <StepPricing form={form} />}
         {step === 2 && (
@@ -173,7 +185,8 @@ export function MultiStepProductForm({
             </button>
           ) : (
             <button
-              type="submit"
+              type="button"
+              onClick={handleFinalSubmit}
               disabled={isSubmitting}
               className="rounded-lg bg-primary px-6 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50 hover:bg-primary/90 transition-colors cursor-pointer"
             >
@@ -181,7 +194,7 @@ export function MultiStepProductForm({
             </button>
           )}
         </div>
-      </form>
+      </div>
     </div>
   );
 }
