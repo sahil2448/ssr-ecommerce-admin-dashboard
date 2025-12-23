@@ -11,20 +11,15 @@ export default async function ProductsPage({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold">Products</h2>
-          <p className="text-sm text-muted-foreground">Manage catalog with CRUD.</p>
+      <div className="rounded-lg bg-card border shadow-sm p-4 sm:p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-lg font-semibold">Products</h2>
+            <p className="text-sm text-muted-foreground mt-1">Manage your product catalog</p>
+          </div>
         </div>
-        <a
-          className="rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground"
-          href="/admin/products/new"
-        >
-          New product
-        </a>
+        <ProductsTable initialQuery={{ page, search }} />
       </div>
-
-      <ProductsTable initialQuery={{ page, search }} />
     </div>
   );
 }

@@ -57,7 +57,7 @@ export function ProductsTable({ initialQuery }: { initialQuery: { page: string; 
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
-            className="w-full rounded-lg border bg-background pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 cursor-text"
+            className="w-full rounded-md border bg-background pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 cursor-text"
             placeholder="Search products..."
             value={search}
             onChange={(e) => {
@@ -68,24 +68,24 @@ export function ProductsTable({ initialQuery }: { initialQuery: { page: string; 
         </div>
         <Link
           href="/admin/products/new"
-          className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer"
         >
           <Plus className="h-4 w-4" />
-          New Product
+          <p className={`hidden sm:inline`}>          New Product
+</p>
         </Link>
       </div>
-
-      <div className="rounded-lg border bg-card overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
+  <div className="rounded-sm border bg-background shadow-sm overflow-hidden">
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[900px]">
             <thead className="border-b bg-muted/50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Product</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Category</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Price</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Stock</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Status</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground  sm:table-cell">Product</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground  sm:table-cell">Category</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground  sm:table-cell">Price</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground  sm:table-cell">Stock</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground  sm:table-cell">Status</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground  sm:table-cell">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -142,7 +142,8 @@ export function ProductsTable({ initialQuery }: { initialQuery: { page: string; 
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm text-muted-foreground">{p.category}</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground sm:table-cell">
+                    {p.category}</td>
                   <td className="px-4 py-3 text-sm font-medium">₹{p.price.toLocaleString()}</td>
                   <td className="px-4 py-3">
                     <span
@@ -169,7 +170,7 @@ export function ProductsTable({ initialQuery }: { initialQuery: { page: string; 
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-end sm:items-center justify-end gap-2">
                       <ProductDetailDialog product={p} />
                       <Link
                         href={`/admin/products/${p._id}/edit`}

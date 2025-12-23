@@ -107,9 +107,9 @@ export function MultiStepProductForm({
   }
 
   return (
-    <div className="rounded-lg border bg-card p-6">
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
+<div className="rounded-lg border bg-background shadow-sm p-4 sm:p-6 max-w-3xl mx-auto">
+        <div className="mb-8">
+<div className="flex items-center justify-between mb-4 gap-3 overflow-x-auto">
           {steps.map((s, i) => (
             <div key={i} className="flex items-center flex-1">
               <div className="flex flex-col items-center">

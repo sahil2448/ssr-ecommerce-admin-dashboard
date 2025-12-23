@@ -17,7 +17,7 @@ export default function AdminDashboard() {
       <div className="grid gap-4 md:grid-cols-2">
         <Link
           href="/admin/products"
-          className="group rounded-lg border bg-card p-6 hover:shadow-lg transition-all cursor-pointer"
+          className="group rounded-md border bg-card p-6 hover:shadow-lg transition-all cursor-pointer"
         >
           <h3 className="font-semibold mb-2 flex items-center justify-between">
             Manage Products
@@ -30,7 +30,7 @@ export default function AdminDashboard() {
 
         <Link
           href="/admin/analytics"
-          className="group rounded-lg border bg-card p-6 hover:shadow-lg transition-all cursor-pointer"
+          className="group rounded-md border bg-card p-6 hover:shadow-lg transition-all cursor-pointer"
         >
           <h3 className="font-semibold mb-2 flex items-center justify-between">
             View Analytics

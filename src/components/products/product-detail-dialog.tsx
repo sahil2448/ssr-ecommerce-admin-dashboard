@@ -31,8 +31,8 @@ export function ProductDetailDialog({ product }: { product: Product }) {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 overflow-y-auto">
-          <div className="w-full max-w-4xl rounded-lg bg-card shadow-2xl border my-8">
-            <div className="flex items-center justify-between border-b p-4">
+<div className="w-full max-w-4xl rounded-lg bg-card shadow-2xl border my-8 max-h-[90vh] overflow-y-auto"> 
+             <div className="flex items-center justify-between border-b p-4">
               <h2 className="text-lg font-semibold">Product Details</h2>
               <button
                 onClick={() => setOpen(false)}
