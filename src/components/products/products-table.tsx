@@ -30,7 +30,12 @@ type ProductsResponse = {
   totalPages: number;
 };
 
-export function ProductsTable({ initialQuery }: { initialQuery: { page: string; search: string } }) {
+interface ProductsTableProps {
+  initialQuery: { page: string; search: string };
+  userRole: "admin" | "editor" | "viewer";
+}
+
+export function ProductsTable({ initialQuery, userRole }: ProductsTableProps) {
   const [search, setSearch] = useState(initialQuery.search);
   const [page, setPage] = useState(Number(initialQuery.page) || 1);
 
@@ -45,10 +50,22 @@ export function ProductsTable({ initialQuery }: { initialQuery: { page: string; 
 
   const { data, isLoading, mutate } = useApiSWR<ProductsResponse>(`/api/products?${qs}`);
 
+  const canEdit = userRole === "admin" || userRole === "editor";
+  const canDelete = userRole === "admin";
+
   async function onDelete(id: string) {
-    await api(`/api/products/${id}`, { method: "DELETE" });
-    toast.success("Product deleted");
-    mutate();
+    if (userRole !== "admin") {
+      toast.error("Only admins can delete products");
+      return;
+    }
+
+    try {
+      await api(`/api/products/${id}`, { method: "DELETE" });
+      toast.success("Product deleted");
+      mutate();
+    } catch (error: any) {
+      toast.error(error.message || "Failed to delete product");
+    }
   }
 
   return (
@@ -66,46 +83,71 @@ export function ProductsTable({ initialQuery }: { initialQuery: { page: string; 
             }}
           />
         </div>
-        <Link
-          href="/admin/products/new"
-          className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer"
-        >
-          <Plus className="h-4 w-4" />
-          <p className={`hidden sm:inline`}>          New Product
-</p>
-        </Link>
+        
+        {canEdit && (
+          <Link
+            href="/admin/products/new"
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer"
+          >
+            <Plus className="h-4 w-4" />
+            <p className="hidden sm:inline">New Product</p>
+          </Link>
+        )}
+        
+        {!canEdit && (
+          <div className="text-xs text-muted-foreground px-3 py-2 bg-muted rounded-md">
+            Read-only access
+          </div>
+        )}
       </div>
-  <div className="rounded-sm border bg-background shadow-sm overflow-hidden">
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[900px]">
+
+      <div className="rounded-sm border bg-background shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[900px]">
             <thead className="border-b bg-muted/50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground  sm:table-cell">Product</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground  sm:table-cell">Category</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground  sm:table-cell">Price</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground  sm:table-cell">Stock</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground  sm:table-cell">Status</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground  sm:table-cell">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground sm:table-cell">
+                  Product
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground sm:table-cell">
+                  Category
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground sm:table-cell">
+                  Price
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground sm:table-cell">
+                  Stock
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground sm:table-cell">
+                  Status
+                </th>
+                {canEdit && (
+                  <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground sm:table-cell">
+                    Actions
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y">
               {isLoading && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                  <td colSpan={canEdit ? 6 : 5} className="px-4 py-8 text-center text-sm text-muted-foreground">
                     Loading...
                   </td>
                 </tr>
               )}
               {!isLoading && (data?.items?.length ?? 0) === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center">
+                  <td colSpan={canEdit ? 6 : 5} className="px-4 py-8 text-center">
                     <div className="text-sm text-muted-foreground">No products found</div>
-                    <Link
-                      href="/admin/products/new"
-                      className="mt-2 inline-block text-sm text-primary hover:underline cursor-pointer"
-                    >
-                      Create your first product
-                    </Link>
+                    {canEdit && (
+                      <Link
+                        href="/admin/products/new"
+                        className="mt-2 inline-block text-sm text-primary hover:underline cursor-pointer"
+                      >
+                        Create your first product
+                      </Link>
+                    )}
                   </td>
                 </tr>
               )}
@@ -115,12 +157,12 @@ export function ProductsTable({ initialQuery }: { initialQuery: { page: string; 
                     <div className="flex items-center gap-3">
                       <div className="h-12 w-12 rounded-md bg-muted overflow-hidden flex-shrink-0 border">
                         {p.images?.[0]?.url ? (
-                          <img 
-                            src={p.images[0].url} 
-                            alt={p.name} 
+                          <img
+                            src={p.images[0].url}
+                            alt={p.name}
                             className="h-full w-full object-cover"
                             onError={(e) => {
-                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.style.display = "none";
                               e.currentTarget.parentElement!.innerHTML = `
                                 <div class="h-full w-full flex items-center justify-center">
                                   <svg class="h-6 w-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -142,8 +184,7 @@ export function ProductsTable({ initialQuery }: { initialQuery: { page: string; 
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm text-muted-foreground sm:table-cell">
-                    {p.category}</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground sm:table-cell">{p.category}</td>
                   <td className="px-4 py-3 text-sm font-medium">₹{p.price.toLocaleString()}</td>
                   <td className="px-4 py-3">
                     <span
@@ -169,18 +210,24 @@ export function ProductsTable({ initialQuery }: { initialQuery: { page: string; 
                       {p.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-end sm:items-center justify-end gap-2">
-                      <ProductDetailDialog product={p} />
-                      <Link
-                        href={`/admin/products/${p._id}/edit`}
-                        className="rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-muted transition-colors cursor-pointer"
-                      >
-                        Edit
-                      </Link>
-                      <DeleteProductDialog productName={p.name} onConfirm={() => onDelete(p._id)} />
-                    </div>
-                  </td>
+                  
+                  {canEdit && (
+                    <td className="px-4 py-3">
+                      <div className="flex items-end sm:items-center justify-end gap-2">
+                        <ProductDetailDialog product={p} />
+                        <Link
+                          href={`/admin/products/${p._id}/edit`}
+                          className="rounded-md border px-3 py-1.5 text-xs font-medium hover:bg-muted transition-colors cursor-pointer"
+                        >
+                          Edit
+                        </Link>
+                        
+                        {canDelete && (
+                          <DeleteProductDialog productName={p.name} onConfirm={() => onDelete(p._id)} />
+                        )}
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -209,9 +256,7 @@ export function ProductsTable({ initialQuery }: { initialQuery: { page: string; 
                       key={pageNum}
                       onClick={() => setPage(pageNum)}
                       className={`h-8 w-8 rounded-md text-xs font-medium transition-colors cursor-pointer ${
-                        data.page === pageNum
-                          ? "bg-primary text-primary-foreground"
-                          : "hover:bg-muted"
+                        data.page === pageNum ? "bg-primary text-primary-foreground" : "hover:bg-muted"
                       }`}
                     >
                       {pageNum}

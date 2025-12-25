@@ -1,26 +1,54 @@
-import type { NextRequest } from "next/server";
+import { auth } from "@/lib/auth/auth";
 import { NextResponse } from "next/server";
-import { parseBasicAuth, isValidAdmin } from "@/lib/auth/basicAuth";
 
-function unauthorized() {
-  return new NextResponse("Unauthorized", {
-    status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="Admin"' },
-  });
-}
+const ROLE_PERMISSIONS = {
+  admin: ["/admin/*"],
+  editor: ["/admin/products", "/admin/products/*"],
+  viewer: ["/admin/products"],
+};
 
-export function middleware(req: NextRequest) {
-  const path = req.nextUrl.pathname;
-  const shouldProtect = path.startsWith("/admin") || path.startsWith("/api");
-  if (!shouldProtect) return NextResponse.next();
-
-  const creds = parseBasicAuth(req.headers.get("authorization"));
-  if (!creds) return unauthorized();
-
-  if (!isValidAdmin(creds.user, creds.pass)) return unauthorized();
+export default auth((req) => {
+  const { pathname } = req.nextUrl;
+  const session = req.auth;
+  
+  const publicRoutes = ["/auth/login", "/auth/register", "/api/auth/*"];
+  const isPublicRoute = publicRoutes.some((route) =>
+    pathname.startsWith(route.replace("*", ""))
+  );
+  
+  if (isPublicRoute) {
+    return NextResponse.next();
+  }
+  
+  if (pathname.startsWith("/admin")) {
+    if (!session?.user) {
+      const loginUrl = new URL("/auth/login", req.url);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    
+    const userRole = session.user.role;
+    const allowedRoutes = ROLE_PERMISSIONS[userRole] || [];
+    
+    const hasAccess = allowedRoutes.some((route) => {
+      if (route.endsWith("*")) {
+        return pathname.startsWith(route.replace("*", ""));
+      }
+      return pathname === route;
+    });
+    
+    if (!hasAccess && userRole !== "admin") {
+      return NextResponse.redirect(new URL("/admin/unauthorized", req.url));
+    }
+  }
+  
   return NextResponse.next();
-}
+});
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/api/products/:path*",
+    "/api/metrics/:path*",
+  ],
 };

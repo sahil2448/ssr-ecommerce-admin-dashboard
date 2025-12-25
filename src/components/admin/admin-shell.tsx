@@ -4,8 +4,15 @@ import { ReactNode, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { SidebarContent } from "@/components/admin/sidebar";
+import { UserMenu } from "@/components/auth/user-menu";
+import type { Session } from "next-auth";
 
-export function AdminShell({ children }: { children: ReactNode }) {
+interface AdminShellProps {
+  children: ReactNode;
+  session: Session;
+}
+
+export function AdminShell({ children, session }: AdminShellProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -26,8 +33,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <SidebarContent />
           </div>
 
-          <div className="border-t bg-muted/20 px-4 py-3 text-[11px] text-muted-foreground">
-            Protected by Basic Auth
+          <div className="border-t bg-card p-2">
+            <UserMenu session={session} />
           </div>
         </div>
       </aside>
@@ -42,11 +49,11 @@ export function AdminShell({ children }: { children: ReactNode }) {
               <Menu className="h-4 w-4" />
               Menu
             </button>
-            <div className="text-sm font-semibold">Dashboard</div>
+            <UserMenu session={session} compact />
           </div>
         </div>
 
-       <div className="mx-auto max-w-6xl px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6">
+        <div className="mx-auto max-w-6xl px-3 py-4 sm:px-4 sm:py-5 md:px-6 md:py-6">
           {children}
         </div>
       </div>
@@ -84,8 +91,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
               <SidebarContent />
             </div>
 
-            <div className="border-t bg-muted/20 px-4 py-3 text-[11px] text-muted-foreground">
-              Protected by Basic Auth
+            <div className="border-t bg-card p-2">
+              <UserMenu session={session} />
             </div>
           </div>
         </div>

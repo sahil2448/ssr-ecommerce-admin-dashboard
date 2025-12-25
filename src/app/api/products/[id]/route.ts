@@ -7,6 +7,7 @@ import { Product } from "@/models/Product";
 import { UpdateProductSchema } from "@/lib/validators/product";
 import { s3, AWS_S3_BUCKET } from "@/lib/s3";
 import { DeleteObjectsCommand } from "@aws-sdk/client-s3";
+import { auth } from "@/lib/auth/auth";
 
 function badId(id: string) {
   return !mongoose.Types.ObjectId.isValid(id);
@@ -16,7 +17,13 @@ export async function GET(
   _: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params; // Await params [web:171][web:172]
+  const session = await auth();
+  
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
   if (badId(id)) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   await connectDB();
 
@@ -30,7 +37,17 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params; // Await params [web:171][web:172]
+  const session = await auth();
+  
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (session.user.role === "viewer") {
+    return NextResponse.json({ error: "Forbidden: Viewers cannot edit products" }, { status: 403 });
+  }
+
+  const { id } = await params;
   if (badId(id)) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   await connectDB();
 
@@ -41,7 +58,6 @@ export async function PATCH(
   const parsed = UpdateProductSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 
-  // If images are included in PATCH, delete removed keys from S3
   if (parsed.data.images) {
     const prevKeys = new Set((existing.images ?? []).map((i: any) => i.key));
     const nextKeys = new Set((parsed.data.images ?? []).map((i: any) => i.key));
@@ -65,7 +81,17 @@ export async function DELETE(
   _: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params; // Await params [web:171][web:172]
+  const session = await auth();
+  
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (session.user.role !== "admin") {
+    return NextResponse.json({ error: "Forbidden: Only admins can delete products" }, { status: 403 });
+  }
+
+  const { id } = await params;
   if (badId(id)) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   await connectDB();
 

@@ -4,8 +4,15 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { Product } from "@/models/Product";
 import { CreateProductSchema, ListProductsQuerySchema } from "@/lib/validators/product";
+import { auth } from "@/lib/auth/auth";
 
 export async function GET(req: Request) {
+  const session = await auth();
+  
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   await connectDB();
   const url = new URL(req.url);
 
@@ -44,6 +51,16 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const session = await auth();
+  
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (session.user.role === "viewer") {
+    return NextResponse.json({ error: "Forbidden: Viewers cannot create products" }, { status: 403 });
+  }
+
   await connectDB();
   const body = await req.json();
 

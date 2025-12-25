@@ -7,7 +7,6 @@ import { useState } from "react";
 import { ImageIcon, Upload } from "lucide-react";
 import { X } from "lucide-react";
 
-
 type CreateValues = z.infer<typeof CreateProductSchema>;
 
 export function StepBasics({ form }: { form: UseFormReturn<CreateValues> }) {
