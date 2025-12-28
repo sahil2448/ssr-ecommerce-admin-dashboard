@@ -1,6 +1,17 @@
 import { ProductsTable } from "@/components/products/products-table";
 import { auth } from "@/lib/auth/auth";
 import { redirect } from "next/navigation";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Product Management | Admin Dashboard",
+  description: "Manage your e-commerce products with our server-rendered admin dashboard. Create, edit, and delete products efficiently.",
+  keywords: ["product management", "e-commerce", "admin dashboard", "inventory"],
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default async function ProductsPage({
   searchParams,

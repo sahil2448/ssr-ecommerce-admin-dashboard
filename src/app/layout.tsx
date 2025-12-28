@@ -1,8 +1,11 @@
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "sonner";
+import type { Metadata } from "next";
+
+
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,9 +17,32 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+
 export const metadata: Metadata = {
-  title: "Admin Dashboard",
-  description: "E-commerce admin dashboard",
+  title: {
+    default: "Admin Dashboard - Product Management",
+    template: "%s | Admin Dashboard",
+  },
+  description: "Server-side rendered e-commerce product management dashboard built with Next.js. Manage products, track inventory, and analyze sales efficiently.",
+  keywords: ["e-commerce", "admin dashboard", "product management", "Next.js", "SSR"],
+  authors: [{ name: "Your Name" }],
+  creator: "Your Name",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "Admin Dashboard",
+    title: "Product Management Dashboard",
+    description: "Efficient server-side rendered admin dashboard for e-commerce",
+  },
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
 };
 
 export default function RootLayout({

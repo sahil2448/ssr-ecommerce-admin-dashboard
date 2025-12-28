@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { X, Package, Tag, Layers, DollarSign } from "lucide-react";
+import { X, Package, Tag, Layers, DollarSign, Edit} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 type Product = {
   _id: string;
@@ -16,9 +18,46 @@ type Product = {
   createdAt: string;
 };
 
+type DescriptionRendererProps = {
+  text:string,
+
+}
+
+  const DescriptionRenderer = ({ text }: DescriptionRendererProps) => {
+  if (!text) return <p className="text-slate-400 italic">No description provided.</p>;
+
+  const lines = text.split(/\n/).filter(line => line.trim() !== "");
+  const isList = lines.length > 1 && lines.some(line => /^[\s·•*-]/.test(line.trim()));
+
+  if (isList) {
+    return (
+      <ul className="space-y-3">
+        {lines.map((line, idx) => {
+          const cleanLine = line.replace(/^[\s·•*-]+/, "").trim();
+          return (
+            <li key={idx} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400 leading-snug">
+              <span className="mt-2 h-1 w-1 flex-shrink-0 rounded-full bg-slate-400" />
+              <span>{cleanLine}</span>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
+
+  
+  return (
+    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-line">
+      {text}
+    </p>
+  );
+};
+
+
 export function ProductDetailDialog({ product }: { product: Product }) {
   const [open, setOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
+
 
   return (
     <>
@@ -132,19 +171,40 @@ export function ProductDetailDialog({ product }: { product: Product }) {
                 </div>
 
                 <div className="pt-4 border-t">
-                  <div className="text-xs font-medium text-muted-foreground mb-2">Description</div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {product.description}
-                  </p>
+                  <div className="text-md font-medium text-muted-foreground mb-1 p-1">Description</div>
+                      <div className="p-4 rounded-lg bg-slate-50/50 dark:bg-slate-900/40 border border-slate-100 dark:border-slate-800">
+                        <DescriptionRenderer
+                         text={product.description} />
+                      </div>
                 </div>
 
-                <div className="pt-4 border-t text-xs text-muted-foreground">
+<div className="flex w-full">
+    <div className="pt-4 border-t text-xs text-muted-foreground w-full">
                   Created: {new Date(product.createdAt).toLocaleDateString("en-IN", {
                     day: "numeric",
                     month: "long",
                     year: "numeric"
                   })}
                 </div>
+
+</div>
+                <div className="flex mr-0  justify-start items-end w-full">
+                  <Button
+                          type="button"
+                          variant="default"
+                        >
+                          <Link                          
+                          href={`/admin/products/${product._id}/edit`}
+                           className="flex justify-center  items-center gap-2 rounded-md  text-xs font-medium  transition-colors cursor-pointer"
+
+ > 
+                            <Edit className="h-4 w-4" />Edit
+
+</Link>
+                          
+                        </Button>
+                </div>
+              
               </div>
             </div>
           </div>

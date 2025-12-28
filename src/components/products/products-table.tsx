@@ -6,7 +6,7 @@ import { useApiSWR } from "@/lib/swr";
 import { api } from "@/lib/http";
 import { toast } from "sonner";
 import { DeleteProductDialog } from "./delete-product-dialog";
-import { ProductDetailDialog } from "./product-detail-dialog";
+import {ProductDetailDialog} from "./product-detail-dialog";
 import { Search, Plus, Package } from "lucide-react";
 
 type Product = {

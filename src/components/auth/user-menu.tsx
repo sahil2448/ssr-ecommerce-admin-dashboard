@@ -56,9 +56,8 @@ export function UserMenu({ session, compact }: UserMenuProps) {
             {getInitials(session.user.name || "User")}
           </div>
           <ChevronDown
-            className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
-              isOpen ? "rotate-180" : ""
-            }`}
+            className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+              }`}
           />
         </button>
 
@@ -123,9 +122,8 @@ export function UserMenu({ session, compact }: UserMenuProps) {
           </span>
         </div>
         <ChevronDown
-          className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+            }`}
         />
       </button>
 
