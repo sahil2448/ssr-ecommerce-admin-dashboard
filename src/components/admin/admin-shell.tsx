@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { SidebarContent } from "@/components/admin/sidebar";
 import { UserMenu } from "@/components/auth/user-menu";
@@ -15,6 +15,7 @@ interface AdminShellProps {
 export function AdminShell({ children, session }: AdminShellProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setOpen(false);
@@ -24,7 +25,7 @@ export function AdminShell({ children, session }: AdminShellProps) {
     <div className="min-h-screen bg-muted/30">
       <aside className="hidden md:flex fixed inset-y-0 left-0 w-64 border-r bg-card shadow-sm">
         <div className="flex h-full w-full flex-col">
-          <div className="border-b bg-muted/30 px-4 py-4">
+          <div className="border-b bg-muted/30 px-4 py-4 cursor-pointer" onClick={()=>router.push('/')}>
             <div className="text-base font-bold">Admin Dashboard</div>
             <div className="text-xs text-muted-foreground">E-commerce Management</div>
           </div>
