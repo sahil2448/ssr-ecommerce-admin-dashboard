@@ -104,7 +104,7 @@ export async function DELETE(
     await s3.send(
       new DeleteObjectsCommand({
         Bucket: AWS_S3_BUCKET,
-        Delete: { Objects: keys.map((Key) => ({ Key })) },
+        Delete: { Objects: keys.map((Key: string) => ({ Key })) },
       })
     );
   }
