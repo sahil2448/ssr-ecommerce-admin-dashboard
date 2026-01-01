@@ -7,9 +7,9 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { Eye, EyeOff, Github } from "lucide-react";
 
-export default function LoginPage() {
+function LoginFormContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams(); 
   const callbackUrl = searchParams.get("callbackUrl") || "/admin/products";
   
   const [loading, setLoading] = useState(false);
@@ -50,9 +50,7 @@ export default function LoginPage() {
   }
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
-      <div className="w-full max-w-md">
+    <div className="w-full max-w-md">
         <div className="bg-card rounded-lg shadow-lg border p-8">
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold">Admin Login</h1>
@@ -139,7 +137,15 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
+      <Suspense fallback={<div>Loading login...</div>}>
+        <LoginFormContent />
+      </Suspense>
     </div>
-    </Suspense>
   );
 }
