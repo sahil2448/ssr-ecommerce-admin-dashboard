@@ -13,7 +13,6 @@ export const s3 = new S3Client({
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
   },
 
-  // Prevent SDK from forcing checksum headers in common presign flows [web:243][web:252]
   requestChecksumCalculation: "WHEN_REQUIRED",
   responseChecksumValidation: "WHEN_REQUIRED",
 });
