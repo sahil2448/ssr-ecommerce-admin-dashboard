@@ -18,9 +18,9 @@ import {
 import { Package, TrendingUp, ShoppingBag } from "lucide-react";
 
 
-export default function SalesChartClient({ payload }) {
+export default function SalesChartClient({ payload }: { payload: any }) {
   const daily = React.useMemo(() => {
-    return (payload?.daily ?? []).map((d) => ({
+    return (payload?.daily ?? []).map((d: any) => ({
       date: `${String(d._id.d).padStart(2, "0")}/${String(d._id.m).padStart(2, "0")}`,
       revenue: d.revenue,
       units: d.units,
@@ -79,7 +79,7 @@ export default function SalesChartClient({ payload }) {
                   fontSize: "12px",
                   boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                 }}
-                formatter={(value) => [`₹${value.toLocaleString()}`, "Revenue"]}
+                formatter={(value) => [`₹${value?.toLocaleString()}`, "Revenue"]}
               />
               <Area
                 type="monotone"
@@ -155,7 +155,7 @@ export default function SalesChartClient({ payload }) {
             <h3 className="text-sm font-semibold">Top 5 Products by Revenue</h3>
           </div>
           <div className="p-4 space-y-3">
-            {topProducts.map((p, i) => (
+            {topProducts.map((p: any, i: number) => (
               <div
                 key={p._id}
                 className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-transparent hover:border-border transition-all"
