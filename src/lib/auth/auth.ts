@@ -4,6 +4,7 @@ import GitHub from "next-auth/providers/github";
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import { z } from "zod";
+import { authConfig } from "./config";
 
 declare module "next-auth" {
   interface Session {
@@ -24,6 +25,7 @@ const loginSchema = z.object({
 });
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  ...authConfig,
   providers: [
     Credentials({
       name: "credentials",
@@ -72,13 +74,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
   ],
-  
-  pages: {
-    signIn: "/auth/login",
-    error: "/auth/error",
-  },
-  
   callbacks: {
+    ...authConfig.callbacks,
     async signIn({ user, account, profile }) {
       if (account?.provider === "github") {
         try {
@@ -112,36 +109,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return false;
         }
       }
-      
       return true;
     },
-    
-    async jwt({ token, user, trigger, session }) {
-      if (user) {
-        token.id = user.id;
-        token.role = user.role;
-      }
-      
-      if (trigger === "update" && session) {
-        token.role = session.role;
-      }
-      
-      return token;
-    },
-    
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as "admin" | "editor" | "viewer";
-      }
-      return session;
-    },
   },
-  
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
-  },
-  
-  secret: process.env.AUTH_SECRET,
 });

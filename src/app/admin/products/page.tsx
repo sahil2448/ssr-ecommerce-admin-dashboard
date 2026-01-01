@@ -1,3 +1,4 @@
+export const runtime = "nodejs";
 import { ProductsTable } from "@/components/products/products-table";
 import { auth } from "@/lib/auth/auth";
 import { redirect } from "next/navigation";

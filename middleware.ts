@@ -1,5 +1,8 @@
-import { auth } from "@/lib/auth/auth";
+import NextAuth from "next-auth";
+import { authConfig } from "@/lib/auth/config";
 import { NextResponse } from "next/server";
+
+const { auth } = NextAuth(authConfig);
 
 const ROLE_PERMISSIONS = {
   admin: ["/admin/*"],
@@ -27,7 +30,8 @@ export default auth((req) => {
       return NextResponse.redirect(loginUrl);
     }
     
-    const userRole = session.user.role;
+    // @ts-ignore - Role might be undefined in edge runtime types but exists in token
+    const userRole = session.user.role as keyof typeof ROLE_PERMISSIONS;
     const allowedRoutes = ROLE_PERMISSIONS[userRole] || [];
     
     const hasAccess = allowedRoutes.some((route) => {
