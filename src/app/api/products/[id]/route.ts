@@ -67,7 +67,7 @@ export async function PATCH(
       await s3.send(
         new DeleteObjectsCommand({
           Bucket: AWS_S3_BUCKET,
-          Delete: { Objects: removedKeys.map((Key) => ({ Key })) },
+          Delete: { Objects: removedKeys.map((Key) => ({ Key:Key as string})) },
         })
       );
     }
