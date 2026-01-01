@@ -31,11 +31,9 @@ export async function POST(req: Request) {
     Bucket: AWS_S3_BUCKET,
     Key: key,
     ContentType: fileType,
-    // Disable automatic checksum to avoid signature mismatch
     ChecksumAlgorithm: undefined,
   });
 
-  // Sign without checksum parameters
   const uploadUrl = await getSignedUrl(s3, command, { 
     expiresIn: 60 * 5,
     unhoistableHeaders: new Set(["x-amz-checksum-crc32"]),

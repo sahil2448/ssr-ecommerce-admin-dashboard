@@ -26,7 +26,7 @@ export default function LandingPage() {
     visible: {
       y: 0,
       opacity: 1,
-      transition: { duration: 0.5, ease: "easeOut" },
+      transition: { duration: 0.5, ease: "easeOut" as const },
     },
   };
 
@@ -236,7 +236,7 @@ export default function LandingPage() {
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
+          transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" as const }}
           className="mt-12 sm:mt-20 md:mt-24 relative mx-auto max-w-6xl px-4"
         >
           <div className="relative rounded-lg sm:rounded-xl bg-card border shadow-2xl overflow-hidden group">
