@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 
-export async function generateMetadata({ 
+export default async function generateMetadata({ 
   params 
 }: { 
   params: Promise<{ id: string }> 
