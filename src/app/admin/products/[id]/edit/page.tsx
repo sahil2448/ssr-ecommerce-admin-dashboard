@@ -5,15 +5,22 @@ export default async function EditProductPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params; // Must await params in Next.js 15+ [web:171][web:172]
+  const { id } = await params;
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="text-lg font-semibold">Edit product</h2>
-        <p className="text-sm text-muted-foreground">Update fields, add/remove images, save.</p>
+    <div className="container max-w-4xl mx-auto py-8 px-4 sm:px-6">
+      <div className="mb-8 text-center sm:text-left">
+        <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+          Edit Product
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Update product details, pricing, and images below.
+        </p>
       </div>
-      <MultiStepProductForm mode="edit" productId={id} />
+
+      <div className="mx-auto">
+        <MultiStepProductForm mode="edit" productId={id} />
+      </div>
     </div>
   );
 }

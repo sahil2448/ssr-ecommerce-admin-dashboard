@@ -17,7 +17,7 @@ export default async function UsersPage() {
     <div className="space-y-4">
       <div className="rounded-lg bg-card border shadow-sm p-4 sm:p-6">
         <div className="mb-6">
-          <h2 className="text-lg font-semibold">User Management</h2>
+          <h2 className="text-2xl  font-bold">User Management</h2>
           <p className="text-sm text-muted-foreground mt-1">
             Create and manage user accounts with role assignments
           </p>

@@ -244,7 +244,7 @@ export default function LandingPage() {
               <img 
                 src="/Hero.png" 
                 alt="Dashboard Preview" 
-                className="absolute inset-0 w-full h-full object-cover object-top"
+                className="absolute inset-0 w-full h-full object-bottom-right object-top"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>

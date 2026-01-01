@@ -33,7 +33,7 @@ export default async function ProductsPage({
       <div className="rounded-lg bg-card border shadow-sm p-4 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-lg font-semibold">Products</h2>
+            <h2 className="text-2xl  font-bold">Products</h2>
             <p className="text-sm text-muted-foreground mt-1">
               Manage your product catalog
             </p>
