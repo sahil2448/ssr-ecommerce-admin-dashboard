@@ -119,32 +119,48 @@ export function MultiStepProductForm({
   }
 
   return (
-    <div className="rounded-lg border bg-background shadow-sm p-4 sm:p-6 max-w-3xl mx-auto">
-      <div className="mb-8">
-        <div className="flex items-center justify-center gap-2 sm:gap-4 max-w-2xl mx-auto">
-          {steps.map((s, i) => (
-            <div key={i} className="flex items-center">
-              <div className="flex flex-col items-center min-w-0">
-                <div
-                  className={`h-10 w-10 shrink-0 rounded-full flex items-center justify-center text-sm font-medium transition-all ${
-                    i < step
-                      ? "bg-primary text-primary-foreground"
-                      : i === step
-                      ? "bg-primary text-primary-foreground ring-4 ring-primary/20 scale-110"
-                      : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  {i < step ? <Check className="h-5 w-5" /> : i + 1}
-                </div>
-                <div className="mt-2 text-xs font-medium text-center whitespace-nowrap">{s.title}</div>
-              </div>
-              {i < steps.length - 1 && (
-                <div className={`h-0.5 w-12 sm:w-20 mx-2 transition-colors ${i < step ? "bg-primary" : "bg-muted"}`} />
-              )}
+<div className="rounded-lg border bg-background shadow-sm p-4 sm:p-6 max-w-3xl mx-auto">
+  <div className="mb-6 sm:mb-8">
+    <div className="flex items-center justify-between sm:justify-center w-full max-w-2xl mx-auto">
+      {steps.map((s, i) => (
+        <div key={i} className="flex items-center flex-1 sm:flex-none">
+          <div className="flex flex-col items-center relative w-full sm:w-auto z-10">
+            <div
+              className={`h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-full flex items-center justify-center text-xs sm:text-sm font-medium transition-all duration-300 ${
+                i < step
+                  ? "bg-primary text-primary-foreground"
+                  : i === step
+                  ? "bg-primary text-primary-foreground ring-4 ring-primary/20 scale-110"
+                  : "bg-muted text-muted-foreground"
+              }`}
+            >
+              {i < step ? <Check className="h-4 w-4 sm:h-5 sm:w-5" /> : i + 1}
             </div>
-          ))}
+            <div className={`mt-2 text-[10px] sm:text-xs font-medium text-center whitespace-nowrap transition-colors ${
+                i <= step ? "text-foreground" : "text-muted-foreground"
+            }`}>
+              {s.title}
+            </div>
+          </div>
+
+          {i < steps.length - 1 && (
+            <div className="flex-1 hidden sm:flex items-center px-2">
+                <div className={`h-0.5 w-full min-w-[1.5rem] sm:w-20 transition-colors duration-300 ${
+                    i < step ? "bg-primary" : "bg-muted"
+                }`} />
+            </div>
+          )}
+          
+           {i < steps.length - 1 && (
+            <div className={`flex-1 h-0.5 mx-1 sm:hidden transition-colors duration-300 ${
+                 i < step ? "bg-primary" : "bg-muted"
+            }`} />
+          )}
         </div>
-      </div>
+      ))}
+    </div>
+  </div>
+
 
       <div className="space-y-6">
         {step === 0 && <StepBasics form={form} />}
