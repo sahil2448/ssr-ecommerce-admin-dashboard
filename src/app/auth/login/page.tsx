@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -50,6 +50,7 @@ export default function LoginPage() {
   }
 
   return (
+    <Suspense fallback={<div>Loading...</div>}>
     <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
       <div className="w-full max-w-md">
         <div className="bg-card rounded-lg shadow-lg border p-8">
@@ -139,5 +140,6 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+    </Suspense>
   );
 }
