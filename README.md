@@ -35,7 +35,7 @@ The architecture follows modern best practices with a clear separation between s
 
 ## Live Application
 
-**Deployed URL:** [https://ssr-ecommerce-admin-dashboard.vercel.app](https://ssr-ecommerce-admin-dashboard.vercel.app)
+**Deployed URL:** [https://ssr-ecommerce-admin-dashboard-bfev.vercel.app/](https://ssr-ecommerce-admin-dashboard-bfev.vercel.app/)
 
 ### Demo Credentials
 
