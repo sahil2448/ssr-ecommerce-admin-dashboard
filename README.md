@@ -43,8 +43,6 @@ The architecture follows modern best practices with a clear separation between s
 | Editor | `editor@example.com` | `editor123` | Create, Read, Update products        |
 | Viewer | `viewer@example.com` | `viewer123` | Read-only access                     |
 
-> **Note:** The first user to register through OAuth is automatically assigned the Admin role.
-
 ---
 
 ## Key Features
