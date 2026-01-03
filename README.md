@@ -2,8 +2,6 @@
 
 A production-grade administrative dashboard built with **Next.js 16** featuring server-side rendering for optimal performance and SEO. This application provides a complete solution for managing e-commerce products with advanced features including real-time analytics, role-based access control, and cloud-based image storage.
 
-![Dashboard Preview](public/Hero.png)
-
 ## Table of Contents
 
 - [Project Overview](#project-overview)
@@ -390,27 +388,3 @@ This will:
 | Method | Endpoint           | Description                  | Auth Required |
 | ------ | ------------------ | ---------------------------- | ------------- |
 | POST   | `/api/ai/generate` | Generate product description | Yes           |
-
----
-
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
-
----
-
-## Author
-
-**Sahil Kamble**
-
-- GitHub: [@sahil2448](https://github.com/sahil2448)
-
----
-
-## Acknowledgments
-
-- [Next.js](https://nextjs.org/) - The React Framework
-- [Shadcn UI](https://ui.shadcn.com/) - Beautiful UI components
-- [Vercel](https://vercel.com/) - Deployment platform
-- [MongoDB Atlas](https://www.mongodb.com/atlas) - Database hosting
-- [AWS S3](https://aws.amazon.com/s3/) - Object storage
