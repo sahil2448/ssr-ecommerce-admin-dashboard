@@ -6,8 +6,10 @@ const { auth } = NextAuth(authConfig);
 
 const ROLE_PERMISSIONS = {
   admin: ["/admin/*"],
-  editor: ["/admin/products", "/admin/products/*"],
-  viewer: ["/admin/products"],
+  editor: ["/admin/*"],
+  viewer: ["/admin/*"],
+  // editor: ["/admin/products", "/admin/products/*"],
+  // viewer: ["/admin/products"],
 };
 
 export default auth((req) => {
