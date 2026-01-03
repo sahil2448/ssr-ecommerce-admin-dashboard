@@ -54,7 +54,7 @@ export default function LandingPage() {
 
           <div className="hidden sm:flex items-center gap-6">
             <Link
-              href="https://github.com/yourusername/your-repo"
+              href="https://github.com/sahil2448/ssr-ecommerce-admin-dashboard"
               target="_blank"
               className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
@@ -105,7 +105,7 @@ export default function LandingPage() {
           >
             <div className="container mx-auto px-4 py-4 space-y-3">
               <Link
-                href="https://github.com/yourusername/your-repo"
+                href="https://github.com/sahil2448/ssr-ecommerce-admin-dashboard"
                 target="_blank"
                 className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
@@ -235,7 +235,7 @@ export default function LandingPage() {
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link
-                  href="https://github.com"
+                  href="https://github.com/sahil2448/ssr-ecommerce-admin-dashboard"
                   className="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 bg-muted/60 text-foreground rounded-full font-semibold text-sm hover:bg-muted transition-colors border border-border/50"
                 >
                   View Documentation
