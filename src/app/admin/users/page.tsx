@@ -4,13 +4,14 @@ import { UserManagement } from "@/components/admin/user-management";
 
 export default async function UsersPage() {
   const session = await auth();
+
   
   if (!session?.user) {
     redirect("/auth/login?callbackUrl=/admin/users");
   }
 
   if (session.user.role !== "admin") {
-    redirect("/admin/products?error=unauthorized");
+    redirect("/admin/unauthorized");
   }
 
   return (
