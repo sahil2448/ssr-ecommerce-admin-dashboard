@@ -34,18 +34,18 @@ export default auth((req) => {
     
     // @ts-ignore - Role might be undefined in edge runtime types but exists in token
     const userRole = session.user.role as keyof typeof ROLE_PERMISSIONS;
-    const allowedRoutes = ROLE_PERMISSIONS[userRole] || [];
+    // const allowedRoutes = ROLE_PERMISSIONS[userRole] || [];
     
-    const hasAccess = allowedRoutes.some((route) => {
-      if (route.endsWith("*")) {
-        return pathname.startsWith(route.replace("*", ""));
-      }
-      return pathname === route;
-    });
+    // const hasAccess = allowedRoutes.some((route) => {
+    //   if (route.endsWith("*")) {
+    //     return pathname.startsWith(route.replace("*", ""));
+    //   }
+    //   return pathname === route;
+    // });
     
-    if (!hasAccess && userRole !== "admin") {
-      return NextResponse.redirect(new URL("/admin/unauthorized", req.url));
-    }
+    // if (!hasAccess && userRole !== "admin") {
+    //   return NextResponse.redirect(new URL("/admin/unauthorized", req.url));
+    // }
   }
   
   return NextResponse.next();
