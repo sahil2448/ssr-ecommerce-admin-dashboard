@@ -129,6 +129,6 @@ main().catch(async (e) => {
   console.error(e);
   try {
     await mongoose.connection.close();
-  } catch {}
+  } catch { }
   process.exit(1);
 });

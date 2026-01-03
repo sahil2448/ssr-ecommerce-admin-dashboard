@@ -32,21 +32,23 @@ export default async function ProductsPage({
   return (
     <div className="space-y-4">
       <div className="rounded-lg bg-card border shadow-sm p-4 sm:p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-2xl  font-bold">Products</h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              Manage your product catalog
-            </p>
-          </div>
-          
-          <div className="text-sm text-muted-foreground">
-            Logged in as: <span className="font-medium">{session.user.name}</span>
-            <span className="ml-2 px-2 py-1 bg-primary/10 text-primary rounded text-xs">
-              {session.user.role}
-            </span>
-          </div>
-        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4">
+  <div>
+    <h2 className="text-xl sm:text-2xl font-bold">Products</h2>
+    <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+      Manage your product catalog
+    </p>
+  </div>
+  
+  <div className="text-xs sm:text-sm text-muted-foreground flex flex-wrap items-center gap-2">
+    <span>Logged in as:</span>
+    <span className="font-medium text-foreground">{session.user.name}</span>
+    <span className="px-2 py-1 bg-primary/10 text-primary rounded text-xs font-medium uppercase">
+      {session.user.role}
+    </span>
+  </div>
+</div>
+
         
         <ProductsTable 
           initialQuery={{ page, search }}

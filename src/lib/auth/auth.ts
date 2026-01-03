@@ -1,6 +1,7 @@
 import NextAuth, { DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import GitHub from "next-auth/providers/github";
+import Google from "next-auth/providers/google"; // 1. Import Google
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import { z } from "zod";
@@ -73,11 +74,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
+
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
   ],
   callbacks: {
     ...authConfig.callbacks,
     async signIn({ user, account, profile }) {
-      if (account?.provider === "github") {
+      if (account?.provider === "github" || account?.provider === "google") {
         try {
           await connectDB();
           
@@ -92,12 +98,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           const userCount = await User.countDocuments();
           
           const newUser = await User.create({
-            name: user.name || profile?.name || "GitHub User",
+            name: user.name || profile?.name || "OAuth User",
             email: user.email,
             password: Math.random().toString(36).slice(-12),
             role: userCount === 0 ? "admin" : "viewer",
             isActive: true,
-            githubId: profile?.id,
           });
           
           user.id = newUser._id.toString();
@@ -105,7 +110,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           
           return true;
         } catch (error) {
-          console.error("GitHub sign-in error:", error);
+          console.error(`${account.provider} sign-in error:`, error);
           return false;
         }
       }
