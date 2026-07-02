@@ -1,11 +1,15 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { Providers } from "./providers";
-import { Toaster } from "sonner";
 import type { Metadata } from "next";
-
-
-
+import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "sonner";
+import { Providers } from "./providers";
+import "./globals.css";
+import {
+  buildOpenGraph,
+  buildTwitter,
+  ecommerceAdminKeywords,
+  siteConfig,
+  webApplicationJsonLd,
+} from "@/lib/seo";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,31 +21,45 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-
 export const metadata: Metadata = {
   title: {
-    default: "Admin Dashboard - Product Management",
-    template: "%s | Admin Dashboard",
+    default: siteConfig.title,
+    template: `%s | ${siteConfig.name} Ecommerce Admin Dashboard`,
   },
-  description: "Server-side rendered e-commerce product management dashboard built with Next.js. Manage products, track inventory, and analyze sales efficiently.",
-  keywords: ["e-commerce", "admin dashboard", "product management", "Next.js", "SSR"],
-  authors: [{ name: "Your Name" }],
-  creator: "Your Name",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    siteName: "Admin Dashboard",
-    title: "Product Management Dashboard",
-    description: "Efficient server-side rendered admin dashboard for e-commerce",
+  description: siteConfig.description,
+  keywords: ecommerceAdminKeywords,
+  authors: [{ name: siteConfig.name }],
+  creator: siteConfig.name,
+  publisher: siteConfig.name,
+  metadataBase: new URL(siteConfig.url),
+  alternates: {
+    canonical: "/",
   },
+  openGraph: buildOpenGraph({
+    title: siteConfig.title,
+    description: siteConfig.description,
+    path: "/",
+  }),
+  twitter: buildTwitter({
+    title: siteConfig.title,
+    description: siteConfig.description,
+  }),
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
     googleBot: {
-      index: false,
-      follow: false,
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
+  },
+  category: "technology",
+  classification: "Business Software",
+  other: {
+    "application-name": siteConfig.name,
+    "apple-mobile-web-app-title": siteConfig.name,
   },
 };
 
@@ -52,9 +70,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webApplicationJsonLd()) }}
+        />
         <Providers>
           {children}
           <Toaster position="top-right" richColors />

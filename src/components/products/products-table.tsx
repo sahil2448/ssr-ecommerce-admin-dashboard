@@ -159,7 +159,7 @@ export function ProductsTable({ initialQuery, userRole }: ProductsTableProps) {
                         {p.images?.[0]?.url ? (
                           <img
                             src={p.images[0].url}
-                            alt={p.name}
+                            alt={`${p.name} product thumbnail in the ecommerce admin catalog table`}
                             className="h-full w-full object-cover"
                             onError={(e) => {
                               e.currentTarget.style.display = "none";
@@ -174,7 +174,7 @@ export function ProductsTable({ initialQuery, userRole }: ProductsTableProps) {
                           />
                         ) : (
                           <div className="h-full w-full flex items-center justify-center">
-                            <Package className="h-6 w-6 text-muted-foreground" />
+                            <Package className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
                           </div>
                         )}
                       </div>

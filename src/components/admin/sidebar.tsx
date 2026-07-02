@@ -15,7 +15,7 @@ export function SidebarContent() {
   const pathname = usePathname();
 
   return (
-    <nav className="space-y-1">
+    <nav className="space-y-1" aria-label="Admin dashboard navigation">
       {nav.map((item) => {
         const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
         return (

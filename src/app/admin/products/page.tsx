@@ -2,17 +2,16 @@ export const runtime = "nodejs";
 import { ProductsTable } from "@/components/products/products-table";
 import { auth } from "@/lib/auth/auth";
 import { redirect } from "next/navigation";
-import { Metadata } from "next";
+import type { Metadata } from "next";
+import { privatePageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Product Management | Admin Dashboard",
-  description: "Manage your e-commerce products with our server-rendered admin dashboard. Create, edit, and delete products efficiently.",
-  keywords: ["product management", "e-commerce", "admin dashboard", "inventory"],
-  robots: {
-    index: false,
-    follow: false,
-  },
-};
+export const metadata: Metadata = privatePageMetadata({
+  title: "Product Management",
+  description:
+    "Private AdminSuite product management page for creating, editing, searching, and deleting ecommerce catalog products with server-rendered tables and AI-assisted descriptions.",
+  path: "/admin/products",
+  keywords: ["product management", "ecommerce catalog", "inventory management", "product CRUD"],
+});
 
 export default async function ProductsPage({
   searchParams,
@@ -30,11 +29,11 @@ export default async function ProductsPage({
   const search = sp.search ?? "";
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-lg bg-card border shadow-sm p-4 sm:p-6">
+    <main className="space-y-4">
+      <section className="rounded-lg bg-card border shadow-sm p-4 sm:p-6" aria-label="Product catalog management">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-4">
   <div>
-    <h2 className="text-xl sm:text-2xl font-bold">Products</h2>
+    <h1 className="text-xl sm:text-2xl font-bold">Products</h1>
     <p className="text-xs sm:text-sm text-muted-foreground mt-1">
       Manage your product catalog
     </p>
@@ -54,7 +53,7 @@ export default async function ProductsPage({
           initialQuery={{ page, search }}
           userRole={session.user.role}
         />
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

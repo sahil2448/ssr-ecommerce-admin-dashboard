@@ -252,6 +252,7 @@ export function StepImagesReview({
 }) {
   const [uploading, setUploading] = useState(false);
   const images = form.watch("images");
+  const productName = form.watch("name") || "Product";
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -302,7 +303,11 @@ export function StepImagesReview({
 
           {images.map((img) => (
             <div key={img.key} className="relative group aspect-square rounded-xl border overflow-hidden bg-background shadow-sm ring-1 ring-border/50">
-              <img src={img.url} alt="" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+              <img
+                src={img.url}
+                alt={`${productName} uploaded product image preview`}
+                className="h-full w-full object-cover transition-transform group-hover:scale-105"
+              />
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <button
                   type="button"
@@ -330,7 +335,7 @@ export function StepImagesReview({
 
       <div className="rounded-xl border bg-card shadow-sm overflow-hidden">
         <div className="bg-muted/40 px-4 py-3 border-b">
-          <h3 className="text-sm font-semibold text-foreground">Summary</h3>
+          <h2 className="text-sm font-semibold text-foreground">Summary</h2>
         </div>
         <div className="p-4 space-y-3">
           <div className="flex justify-between items-center py-1">

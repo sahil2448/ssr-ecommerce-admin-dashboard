@@ -87,12 +87,12 @@ export function ProductDetailDialog({ product }: { product: Product }) {
                   {product.images?.length > 0 ? (
                     <img
                       src={product.images[selectedImage]?.url}
-                      alt={product.name}
+                      alt={`${product.name} product image ${selectedImage + 1} shown in the AdminSuite product detail dialog`}
                       className="w-full h-80 object-contain"
                     />
                   ) : (
                     <div className="w-full h-80 flex flex-col items-center justify-center text-muted-foreground">
-                      <Package className="h-16 w-16 mb-2" />
+                      <Package className="h-16 w-16 mb-2" aria-hidden="true" />
                       <span className="text-sm">No image available</span>
                     </div>
                   )}
@@ -108,7 +108,11 @@ export function ProductDetailDialog({ product }: { product: Product }) {
                           i === selectedImage ? "border-primary ring-2 ring-primary/20" : "border-transparent"
                         }`}
                       >
-                        <img src={img.url} alt="" className="h-full w-full object-cover" />
+                        <img
+                          src={img.url}
+                          alt={`${product.name} product thumbnail ${i + 1} for selecting the detail image`}
+                          className="h-full w-full object-cover"
+                        />
                       </button>
                     ))}
                   </div>

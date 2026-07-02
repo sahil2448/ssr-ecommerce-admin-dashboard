@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     const models = [
       "meta-llama/llama-3.2-3b-instruct:free",
       "google/gemini-2.0-flash-exp:free",
-      "microsoft/phi-3-mini-128k-instruct:free"
+      "google/gemma-4-26b-a4b-it:free"
     ];
 
     let generatedText = "";
