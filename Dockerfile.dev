@@ -1,0 +1,35 @@
+# ============================================================
+# DOCKERFILE.DEV — Development Build with Hot Reload
+# Purpose: Run the Next.js application in development mode
+#          inside a Docker container with live code reloading.
+#
+# Key differences from the production Dockerfile:
+#   1. Uses `npm run dev` instead of `npm run build` + `node server.js`
+#   2. No multi-stage build (keeps it simple for dev)
+#   3. Source code is mounted via volume at runtime (not copied here)
+#   4. node_modules are installed inside the image for speed
+# ============================================================
+
+FROM node:22-alpine
+
+# Set working directory inside the container
+WORKDIR /app
+
+# Copy only package files first (for Docker layer caching)
+# If package.json hasn't changed, Docker reuses cached layer
+COPY package.json package-lock.json* ./
+
+# Install ALL dependencies (including devDependencies)
+RUN npm install
+
+# Set environment to development
+ENV NODE_ENV=development
+
+# Expose the port Next.js runs on
+EXPOSE 3000
+
+# Default command: start Next.js in development mode
+# Hot reload works because docker-compose.dev.yml mounts
+# the local source code into /app at runtime, overwriting
+# whatever was copied during the image build.
+CMD ["npm", "run", "dev"]
