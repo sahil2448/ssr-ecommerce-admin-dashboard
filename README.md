@@ -1,6 +1,6 @@
 # Server-Rendered E-commerce Admin Dashboard
 
-A production-grade administrative dashboard built with **Next.js 16** featuring server-side rendering for optimal performance and SEO. This application provides a complete solution for managing e-commerce products with advanced features including real-time analytics, role-based access control, and cloud-based image storage.
+A production-grade administrative dashboard built with **Next.js 16** featuring server-side rendering for optimal performance and SEO (Optimized for AI Agents/Tools). This application provides a complete solution for managing e-commerce products with advanced features including real-time analytics, role-based access control, and cloud-based image storage.
 
 ## Table of Contents
 
