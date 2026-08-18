@@ -3,6 +3,9 @@ import { OverviewCards } from "@/components/analytics/overview-cards";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { privatePageMetadata } from "@/lib/seo";
+import { connectDB } from "@/lib/db";
+import { Product } from "@/models/Product";
+import { Order } from "@/models/Order";
 
 export const metadata: Metadata = privatePageMetadata({
   title: "Dashboard Overview",
@@ -12,7 +15,34 @@ export const metadata: Metadata = privatePageMetadata({
   keywords: ["dashboard overview", "ecommerce KPIs", "low stock alerts", "revenue summary"],
 });
 
-export default function AdminDashboard() {
+export default async function AdminDashboard() {
+  await connectDB();
+
+  const [totalProducts, lowStock, outOfStock, paidRevenueAgg] = await Promise.all([
+    Product.countDocuments({}),
+    Product.countDocuments({ stock: { $lte: 5 } }),
+    Product.countDocuments({ stock: 0 }),
+    Order.aggregate([
+      { $match: { status: "paid" } },
+      { $unwind: "$items" },
+      {
+        $group: {
+          _id: null,
+          revenue: { $sum: { $multiply: ["$items.price", "$items.quantity"] } },
+          units: { $sum: "$items.quantity" },
+        },
+      },
+    ]),
+  ]);
+
+  const overviewData = {
+    totalProducts,
+    lowStock,
+    outOfStock,
+    revenue: paidRevenueAgg[0]?.revenue ?? 0,
+    units: paidRevenueAgg[0]?.units ?? 0,
+  };
+
   return (
     <main className="space-y-6">
       <section aria-label="Dashboard overview">
@@ -23,7 +53,7 @@ export default function AdminDashboard() {
           </p>
         </div>
 
-        <OverviewCards />
+        <OverviewCards initialData={overviewData} />
       </section>
 
       <section aria-label="Quick actions" className="grid gap-4 md:grid-cols-2">

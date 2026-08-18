@@ -32,10 +32,11 @@ type ProductsResponse = {
 
 interface ProductsTableProps {
   initialQuery: { page: string; search: string };
+  initialData?: ProductsResponse;
   userRole: "admin" | "editor" | "viewer";
 }
 
-export function ProductsTable({ initialQuery, userRole }: ProductsTableProps) {
+export function ProductsTable({ initialQuery, initialData, userRole }: ProductsTableProps) {
   const [search, setSearch] = useState(initialQuery.search);
   const [page, setPage] = useState(Number(initialQuery.page) || 1);
 
@@ -48,7 +49,7 @@ export function ProductsTable({ initialQuery, userRole }: ProductsTableProps) {
     return p.toString();
   }, [page, search]);
 
-  const { data, isLoading, mutate } = useApiSWR<ProductsResponse>(`/api/products?${qs}`);
+  const { data, isLoading, mutate } = useApiSWR<ProductsResponse>(`/api/products?${qs}`, initialData);
 
   const canEdit = userRole === "admin" || userRole === "editor";
   const canDelete = userRole === "admin";
@@ -63,8 +64,8 @@ export function ProductsTable({ initialQuery, userRole }: ProductsTableProps) {
       await api(`/api/products/${id}`, { method: "DELETE" });
       toast.success("Product deleted");
       mutate();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to delete product");
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "Failed to delete product");
     }
   }
 

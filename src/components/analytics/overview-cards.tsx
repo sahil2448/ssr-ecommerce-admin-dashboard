@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useApiSWR } from "@/lib/swr";
 import { 
   TrendingUp, 
   Package, 
@@ -11,14 +10,17 @@ import {
   ChevronRight
 } from "lucide-react";
 
-export function OverviewCards() {
-  const { data, isLoading } = useApiSWR<{
-    totalProducts: number;
-    lowStock: number;
-    outOfStock: number;
-    revenue: number;
-    units: number;
-  }>("/api/metrics/overview");
+type OverviewData = {
+  totalProducts: number;
+  lowStock: number;
+  outOfStock: number;
+  revenue: number;
+  units: number;
+};
+
+export function OverviewCards({ initialData }: { initialData?: OverviewData }) {
+  const data = initialData;
+  const isLoading = !data;
 
   const formatCurrency = (val: number | undefined | null) => {
     if (val === undefined || val === null) return "₹0";

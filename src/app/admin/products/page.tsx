@@ -4,6 +4,8 @@ import { auth } from "@/lib/auth/auth";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { privatePageMetadata } from "@/lib/seo";
+import { connectDB } from "@/lib/db";
+import { Product } from "@/models/Product";
 
 export const metadata: Metadata = privatePageMetadata({
   title: "Product Management",
@@ -25,8 +27,42 @@ export default async function ProductsPage({
   }
   
   const sp = await searchParams;
-  const page = sp.page ?? "1";
+  const page = Number(sp.page ?? "1");
   const search = sp.search ?? "";
+  const limit = 10;
+
+  await connectDB();
+
+  const filter: Record<string, unknown> = {};
+  if (search) filter.name = { $regex: search, $options: "i" };
+
+  const [items, total] = await Promise.all([
+    Product.find(filter)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean(),
+    Product.countDocuments(filter),
+  ]);
+
+  const initialData = {
+    items: items.map((p) => ({
+      _id: p._id.toString(),
+      name: p.name,
+      category: p.category,
+      price: p.price,
+      stock: p.stock,
+      sku: p.sku,
+      description: p.description,
+      isActive: p.isActive,
+      images: p.images ?? [],
+      createdAt: p.createdAt?.toISOString() ?? "",
+    })),
+    page,
+    limit,
+    total,
+    totalPages: Math.ceil(total / limit),
+  };
 
   return (
     <main className="space-y-4">
@@ -50,7 +86,8 @@ export default async function ProductsPage({
 
         
         <ProductsTable 
-          initialQuery={{ page, search }}
+          initialQuery={{ page: String(page), search }}
+          initialData={initialData}
           userRole={session.user.role}
         />
       </section>

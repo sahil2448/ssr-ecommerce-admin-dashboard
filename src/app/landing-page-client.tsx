@@ -3,34 +3,28 @@
 import type React from "react"
 
 import Link from "next/link"
-import { motion } from "framer-motion"
-import { ArrowRight, BarChart3, Lock, Zap, Sparkles, Layout, Github, Database, Menu, X } from "lucide-react"
+import Image from "next/image"
+import dynamic from "next/dynamic"
+import { ArrowRight, Layout, Github, Menu, X } from "lucide-react"
 import { useState } from "react"
 import { useSession, signOut } from "next-auth/react"
+
+const AnimatedFeatureCards = dynamic(() => import("./animated-feature-cards"), {
+  loading: () => (
+    <section aria-label="Key features" className="mt-20 sm:mt-32 md:mt-40">
+      <h2 className="sr-only">Key Features of AdminSuite</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 md:gap-8 px-4">
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="h-48 rounded-2xl bg-muted/50 animate-pulse" />
+        ))}
+      </div>
+    </section>
+  ),
+})
 
 export default function LandingPageClient() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { data: session, status } = useSession()
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.3,
-      },
-    },
-  }
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.5, ease: "easeOut" as const },
-    },
-  }
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-purple-500/30">
@@ -103,11 +97,7 @@ export default function LandingPageClient() {
           </div>
 
           {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="sm:hidden border-t bg-background/95 backdrop-blur-2xl"
-            >
+            <div className="sm:hidden border-t bg-background/95 backdrop-blur-2xl animate-[fadeInDown_0.2s_ease-out]">
               <div className="container mx-auto px-4 py-4 space-y-3">
                 <Link
                   href="https://github.com"
@@ -150,7 +140,7 @@ export default function LandingPageClient() {
                   </Link>
                 )}
               </div>
-            </motion.div>
+            </div>
           )}
         </nav>
       </header>
@@ -158,22 +148,16 @@ export default function LandingPageClient() {
       <main className="relative z-10 container mx-auto px-4 sm:px-6 pt-16 sm:pt-28 pb-20 sm:pb-40">
         <article>
           <section aria-label="Hero section">
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="max-w-4xl mx-auto text-center"
-            >
-              <motion.div variants={itemVariants} className="flex justify-center mb-6 sm:mb-8">
+            <div className="max-w-4xl mx-auto text-center animate-[fadeInUp_0.5s_ease-out]">
+              <div className="flex justify-center mb-6 sm:mb-8 animate-[fadeInUp_0.5s_ease-out_0.1s_both]">
                 <span className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/30 text-purple-600 dark:text-purple-400 text-xs font-semibold uppercase tracking-widest">
-                  <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                  <SparklesIcon />
                   Next.js 15 Server Components
                 </span>
-              </motion.div>
+              </div>
 
-              <motion.h1
-                variants={itemVariants}
-                className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-6 sm:mb-10 bg-clip-text text-transparent bg-gradient-to-b from-foreground via-foreground to-foreground/60 px-4"
+              <h1
+                className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-6 sm:mb-10 bg-clip-text text-transparent bg-gradient-to-b from-foreground via-foreground to-foreground/60 px-4 animate-[fadeInUp_0.5s_ease-out_0.2s_both]"
               >
                 {session?.user ? (
                   <>
@@ -190,11 +174,10 @@ export default function LandingPageClient() {
                     </span>
                   </>
                 )}
-              </motion.h1>
+              </h1>
 
-              <motion.p
-                variants={itemVariants}
-                className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 sm:mb-12 max-w-2xl mx-auto leading-relaxed px-4 font-medium"
+              <p
+                className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 sm:mb-12 max-w-2xl mx-auto leading-relaxed px-4 font-medium animate-[fadeInUp_0.5s_ease-out_0.3s_both]"
               >
                 {session?.user ? (
                   <>
@@ -206,11 +189,10 @@ export default function LandingPageClient() {
                     workflows, and Role-Based Access Control.
                   </>
                 )}
-              </motion.p>
+              </p>
 
-              <motion.div
-                variants={itemVariants}
-                className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5 px-4"
+              <div
+                className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-5 px-4 animate-[fadeInUp_0.5s_ease-out_0.4s_both]"
               >
                 {status === "loading" ? (
                   <div className="flex gap-4">
@@ -250,19 +232,22 @@ export default function LandingPageClient() {
                     </Link>
                   </>
                 )}
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           </section>
 
           <section aria-label="Dashboard preview" className="mt-16 sm:mt-24 md:mt-32 relative mx-auto max-w-6xl px-4">
             <div className="relative rounded-2xl sm:rounded-3xl bg-card border border-border/60 shadow-2xl overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" aria-hidden="true" />
               <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-                <img
+                <Image
                   src="/Hero.png"
                   alt="AdminSuite e-commerce admin dashboard hero preview showing the main dashboard interface with product management table, analytics overview cards, and navigation sidebar for managing e-commerce operations"
-                  className="absolute inset-0 w-full h-full object-bottom-right object-top"
-                  loading="eager"
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1152px"
+                  quality={75}
+                  className="object-cover"
                 />
               </div>
             </div>
@@ -270,41 +255,7 @@ export default function LandingPageClient() {
             <div className="absolute -inset-4 sm:-inset-8 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-3xl blur-3xl -z-10" aria-hidden="true" />
           </section>
 
-          <section aria-label="Key features" className="mt-20 sm:mt-32 md:mt-40">
-            <h2 className="sr-only">Key Features of AdminSuite</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 md:gap-8 px-4">
-              <FeatureCard
-                icon={<Zap className="h-6 w-6 text-yellow-500" />}
-                title="SSR Performance"
-                desc="Built with Next.js App Router. Data is pre-fetched on the server for instant page loads and optimal SEO architecture."
-              />
-              <FeatureCard
-                icon={<Sparkles className="h-6 w-6 text-purple-500" />}
-                title="AI-Powered"
-                desc="Integrated generative AI to automate product descriptions, leveraging LLMs to speed up content creation workflows."
-              />
-              <FeatureCard
-                icon={<Lock className="h-6 w-6 text-blue-500" />}
-                title="Secure RBAC"
-                desc="Enterprise-grade security with granular permissions. Admin, Editor, and Viewer roles managed via robust middleware."
-              />
-              <FeatureCard
-                icon={<Database className="h-6 w-6 text-green-500" />}
-                title="MongoDB Aggregation"
-                desc="Complex data analytics and real-time sales tracking powered by optimized MongoDB aggregation pipelines."
-              />
-              <FeatureCard
-                icon={<Layout className="h-6 w-6 text-pink-500" />}
-                title="Modern UI/UX"
-                desc="A stunning interface built with Tailwind CSS, Shadcn UI, and Framer Motion for a fluid, application-like feel."
-              />
-              <FeatureCard
-                icon={<BarChart3 className="h-6 w-6 text-orange-500" />}
-                title="S3 Cloud Storage"
-                desc="Secure, scalable image storage using AWS S3 presigned URLs for direct client-to-cloud uploads."
-              />
-            </div>
-          </section>
+          <AnimatedFeatureCards />
         </article>
       </main>
 
@@ -317,26 +268,10 @@ export default function LandingPageClient() {
   )
 }
 
-function FeatureCard({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
+function SparklesIcon() {
   return (
-    <article>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        viewport={{ once: true }}
-        className="group relative p-6 sm:p-7 md:p-8 rounded-2xl bg-gradient-to-br from-card to-card/50 border border-border/60 hover:border-purple-500/40 shadow-sm hover:shadow-xl transition-all duration-300"
-      >
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/5 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true" />
-
-        <div className="relative z-10">
-          <div className="mb-4 p-3 rounded-lg bg-background/60 w-fit border border-border/40 shadow-sm group-hover:scale-110 group-hover:shadow-lg transition-transform duration-300">
-            {icon}
-          </div>
-          <h3 className="text-lg sm:text-base md:text-lg font-bold mb-2 text-foreground">{title}</h3>
-          <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
-        </div>
-      </motion.div>
-    </article>
+    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+    </svg>
   )
 }
