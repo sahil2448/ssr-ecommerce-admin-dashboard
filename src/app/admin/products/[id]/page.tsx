@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { MultiStepProductForm } from "@/components/products/product-form/multi-step-form";
 import { absoluteUrl, privatePageMetadata } from "@/lib/seo";
 
+export const dynamic = "force-dynamic";
+
 type ProductMetadata = {
   name?: string;
   description?: string;

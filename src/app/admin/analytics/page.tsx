@@ -6,6 +6,8 @@ import { connectDB } from "@/lib/db";
 import { Product } from "@/models/Product";
 import { Order } from "@/models/Order";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = privatePageMetadata({
   title: "Sales Analytics",
   description:

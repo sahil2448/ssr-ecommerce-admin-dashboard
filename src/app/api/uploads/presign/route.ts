@@ -5,7 +5,7 @@ import { z } from "zod";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import crypto from "crypto";
-import { s3, AWS_REGION, AWS_S3_BUCKET } from "@/lib/s3";
+import { getS3, AWS_REGION, AWS_S3_BUCKET } from "@/lib/s3";
 
 const PresignSchema = z.object({
   fileName: z.string().min(1),
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     ChecksumAlgorithm: undefined,
   });
 
-  const uploadUrl = await getSignedUrl(s3, command, { 
+  const uploadUrl = await getSignedUrl(getS3(), command, { 
     expiresIn: 60 * 5,
     unhoistableHeaders: new Set(["x-amz-checksum-crc32"]),
   });

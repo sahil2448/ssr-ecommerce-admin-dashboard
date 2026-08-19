@@ -5,13 +5,14 @@ import mongoose from "mongoose";
 import { connectDB } from "@/lib/db";
 import { Product } from "@/models/Product";
 import { UpdateProductSchema } from "@/lib/validators/product";
-import { s3, AWS_S3_BUCKET } from "@/lib/s3";
+import { getS3, AWS_S3_BUCKET } from "@/lib/s3";
 import { DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import { auth } from "@/lib/auth/auth";
 
 function badId(id: string) {
   return !mongoose.Types.ObjectId.isValid(id);
 }
+
 
 export async function GET(
   _: Request,
@@ -64,7 +65,7 @@ export async function PATCH(
     const removedKeys = [...prevKeys].filter((k) => !nextKeys.has(k));
 
     if (removedKeys.length > 0) {
-      await s3.send(
+      await getS3().send(
         new DeleteObjectsCommand({
           Bucket: AWS_S3_BUCKET,
           Delete: { Objects: removedKeys.map((Key) => ({ Key:Key as string})) },
@@ -101,7 +102,7 @@ export async function DELETE(
   const keys = (deleted.images ?? []).map((img: any) => img?.key).filter(Boolean);
 
   if (keys.length > 0) {
-    await s3.send(
+    await getS3().send(
       new DeleteObjectsCommand({
         Bucket: AWS_S3_BUCKET,
         Delete: { Objects: keys.map((Key: string) => ({ Key })) },
