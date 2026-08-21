@@ -96,16 +96,6 @@ jobs:
             --resource-group "${{ env.RESOURCE_GROUP }}" \
             --min-replicas 1
 
-      # Clear any probes that may have been set by earlier failed attempts.
-      # The app listens on 0.0.0.0:3000, so Azure's default TCP health probe
-      # on the target port (3000) will pass and mark the replica healthy.
-      - name: Clear health probes (use default TCP probe)
-        run: |
-          az containerapp update \
-            --name "${{ env.CONTAINER_APP }}" \
-            --resource-group "${{ env.RESOURCE_GROUP }}" \
-            --set properties.template.containers[0].probes='[]'
-
       - name: Show container logs (diagnostics)
         if: always()
         continue-on-error: true
