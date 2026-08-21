@@ -45,8 +45,6 @@ jobs:
       # Passing them here makes the action call `az containerapp up`
       # with a giant --env-vars argument that exceeds the OS limit
       # ("Argument list too long" / exit code 126).
-      # The healthProbe input is set here (not via az CLI) because
-      # `az containerapp update --health-probe` is unreliable.
       - name: Deploy image to Azure Container App
         uses: azure/container-apps-deploy-action@v1
         with:
@@ -58,7 +56,6 @@ jobs:
           registryPassword: ${{ secrets.ACR_PASSWORD }}
           ingress: external
           targetPort: 3000
-          healthProbe: '[{"path":"/api/health","port":3000,"type":"liveness","initialDelaySeconds":3,"periodSeconds":10,"failureThreshold":3}]'
           disableTelemetry: true
 
       # Set runtime env vars directly with the Azure CLI afterwards.
@@ -98,6 +95,18 @@ jobs:
             --name "${{ env.CONTAINER_APP }}" \
             --resource-group "${{ env.RESOURCE_GROUP }}" \
             --min-replicas 1
+
+      # Point the health probe at /api/health (a lightweight endpoint that
+      # returns 200 immediately, no DB, no middleware). The default probe
+      # hits "/" which triggers NextAuth middleware and can be slow/fail,
+      # causing ACA to mark the replica "degraded" and serve the welcome page.
+      # Correct format: JSON array with containerName + type "Liveness".
+      - name: Configure health probe to /api/health
+        run: |
+          az containerapp update \
+            --name "${{ env.CONTAINER_APP }}" \
+            --resource-group "${{ env.RESOURCE_GROUP }}" \
+            --health-probe '[{"containerName":"ssr-admin-app","path":"/api/health","port":3000,"type":"Liveness","initialDelaySeconds":3,"periodSeconds":10,"failureThreshold":3}]'
 
       - name: Show container logs (diagnostics)
         if: always()
