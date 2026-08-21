@@ -100,12 +100,13 @@ jobs:
       # returns 200 immediately, no DB, no middleware). The default probe
       # hits "/" which triggers NextAuth middleware and can be slow/fail,
       # causing ACA to mark the replica "degraded" and serve the welcome page.
+      # NOTE: --health-probe expects a JSON ARRAY of probe objects.
       - name: Configure health probe to /api/health
         run: |
           az containerapp update \
             --name "${{ env.CONTAINER_APP }}" \
             --resource-group "${{ env.RESOURCE_GROUP }}" \
-            --health-probe '{"path":"/api/health","port":3000,"type":"liveness","initialDelaySeconds":3,"periodSeconds":10,"failureThreshold":3}'
+            --health-probe '[{"path":"/api/health","port":3000,"type":"liveness","initialDelaySeconds":3,"periodSeconds":10,"failureThreshold":3}]'
 
       - name: Show container logs (diagnostics)
         if: always()
