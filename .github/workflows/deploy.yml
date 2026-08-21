@@ -85,6 +85,17 @@ jobs:
               "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
               "OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}"
 
+      # Force at least 1 warm replica. Azure Container Apps scales
+      # to 0 when idle (minReplicas=0), so requests fail cold-start
+      # activation and ACA serves its default placeholder page instead
+      # of the app. A minimum of 1 replica guarantees the app responds.
+      - name: Ensure at least 1 warm replica
+        run: |
+          az containerapp update \
+            --name "${{ env.CONTAINER_APP }}" \
+            --resource-group "${{ env.RESOURCE_GROUP }}" \
+            --min-replicas 1
+
       - name: Show container logs (diagnostics)
         if: always()
         continue-on-error: true
