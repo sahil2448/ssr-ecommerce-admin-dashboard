@@ -96,19 +96,15 @@ jobs:
             --resource-group "${{ env.RESOURCE_GROUP }}" \
             --min-replicas 1
 
-      # Point the health probe at /api/health (a lightweight endpoint that
-      # returns 200 immediately, no DB, no middleware). The default probe
-      # hits "/" which triggers NextAuth middleware and can be slow/fail,
-      # causing ACA to mark the replica "degraded" and serve the welcome page.
-      # NOTE: --health-probe is NOT valid on `az containerapp update` (only
-      # on create). Use the generic --set to patch the probe on the existing
-      # container app's first container.
-      - name: Configure health probe to /api/health
+      # Clear any probes that may have been set by earlier failed attempts.
+      # The app listens on 0.0.0.0:3000, so Azure's default TCP health probe
+      # on the target port (3000) will pass and mark the replica healthy.
+      - name: Clear health probes (use default TCP probe)
         run: |
           az containerapp update \
             --name "${{ env.CONTAINER_APP }}" \
             --resource-group "${{ env.RESOURCE_GROUP }}" \
-            --set properties.template.containers[0].probes='[{"httpGet":{"path":"/api/health","port":3000},"type":"Liveness","initialDelaySeconds":3,"periodSeconds":10,"failureThreshold":3}]'
+            --set properties.template.containers[0].probes='[]'
 
       - name: Show container logs (diagnostics)
         if: always()
