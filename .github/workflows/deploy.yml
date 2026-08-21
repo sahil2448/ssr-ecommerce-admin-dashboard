@@ -41,6 +41,10 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # Deploy the image WITHOUT runtime env vars in the action.
+      # Passing them here makes the action call `az containerapp up`
+      # with a giant --env-vars argument that exceeds the OS limit
+      # ("Argument list too long" / exit code 126).
       - name: Deploy image to Azure Container App
         uses: azure/container-apps-deploy-action@v1
         with:
@@ -52,12 +56,34 @@ jobs:
           registryPassword: ${{ secrets.ACR_PASSWORD }}
           ingress: external
           targetPort: 3000
-          # CRITICAL: These runtime env vars are injected into the container.
-          # Without them the app crashes on boot (Missing MONGODB_URI /
-          # NextAuth missing secret / missing OAuth client IDs).
-          # All values come from GitHub Actions secrets.
-          environmentVariables: '[{"name":"MONGODB_URI","value":"${{ secrets.MONGODB_URI }}"},{"name":"AUTH_SECRET","value":"${{ secrets.AUTH_SECRET }}"},{"name":"JWT_SECRET","value":"${{ secrets.JWT_SECRET }}"},{"name":"NEXTAUTH_URL","value":"${{ secrets.ACA_APP_URL }}"},{"name":"NEXT_PUBLIC_APP_URL","value":"${{ secrets.ACA_APP_URL }}"},{"name":"GITHUB_CLIENT_ID","value":"${{ secrets.GITHUB_CLIENT_ID }}"},{"name":"GITHUB_CLIENT_SECRET","value":"${{ secrets.GITHUB_CLIENT_SECRET }}"},{"name":"GOOGLE_CLIENT_ID","value":"${{ secrets.GOOGLE_CLIENT_ID }}"},{"name":"GOOGLE_CLIENT_SECRET","value":"${{ secrets.GOOGLE_CLIENT_SECRET }}"},{"name":"AWS_REGION","value":"${{ secrets.AWS_REGION }}"},{"name":"AWS_S3_BUCKET","value":"${{ secrets.AWS_S3_BUCKET }}"},{"name":"AWS_ACCESS_KEY_ID","value":"${{ secrets.AWS_ACCESS_KEY_ID }}"},{"name":"AWS_SECRET_ACCESS_KEY","value":"${{ secrets.AWS_SECRET_ACCESS_KEY }}"},{"name":"OPENROUTER_API_KEY","value":"${{ secrets.OPENROUTER_API_KEY }}"}]'
           disableTelemetry: true
+
+      # Set runtime env vars directly with the Azure CLI afterwards.
+      # This avoids the deploy action's internal env-var string build-up
+      # that caused E2BIG. Values come from GitHub Actions secrets.
+      # Required for boot: MONGODB_URI, AUTH_SECRET, NEXTAUTH_URL.
+      # The rest are optional feature config (OAuth, S3, AI) -
+      # kept to match your local .env settings.
+      - name: Configure runtime environment variables
+        run: |
+          az containerapp update \
+            --name "${{ env.CONTAINER_APP }}" \
+            --resource-group "${{ env.RESOURCE_GROUP }}" \
+            --set-env-vars \
+              "MONGODB_URI=${{ secrets.MONGODB_URI }}" \
+              "AUTH_SECRET=${{ secrets.AUTH_SECRET }}" \
+              "JWT_SECRET=${{ secrets.JWT_SECRET }}" \
+              "NEXTAUTH_URL=${{ secrets.ACA_APP_URL }}" \
+              "NEXT_PUBLIC_APP_URL=${{ secrets.ACA_APP_URL }}" \
+              "GITHUB_CLIENT_ID=${{ secrets.GITHUB_CLIENT_ID }}" \
+              "GITHUB_CLIENT_SECRET=${{ secrets.GITHUB_CLIENT_SECRET }}" \
+              "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" \
+              "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+              "AWS_REGION=${{ secrets.AWS_REGION }}" \
+              "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }}" \
+              "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" \
+              "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+              "OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}"
 
       - name: Show container logs (diagnostics)
         if: always()
