@@ -52,4 +52,18 @@ jobs:
           registryPassword: ${{ secrets.ACR_PASSWORD }}
           ingress: external
           targetPort: 3000
+          # CRITICAL: These runtime env vars are injected into the container.
+          # Without them the app crashes on boot (Missing MONGODB_URI /
+          # NextAuth missing secret / missing OAuth client IDs).
+          # All values come from GitHub Actions secrets.
+          environmentVariables: '[{"name":"MONGODB_URI","value":"${{ secrets.MONGODB_URI }}"},{"name":"AUTH_SECRET","value":"${{ secrets.AUTH_SECRET }}"},{"name":"JWT_SECRET","value":"${{ secrets.JWT_SECRET }}"},{"name":"NEXTAUTH_URL","value":"${{ secrets.ACA_APP_URL }}"},{"name":"NEXT_PUBLIC_APP_URL","value":"${{ secrets.ACA_APP_URL }}"},{"name":"GITHUB_CLIENT_ID","value":"${{ secrets.GITHUB_CLIENT_ID }}"},{"name":"GITHUB_CLIENT_SECRET","value":"${{ secrets.GITHUB_CLIENT_SECRET }}"},{"name":"GOOGLE_CLIENT_ID","value":"${{ secrets.GOOGLE_CLIENT_ID }}"},{"name":"GOOGLE_CLIENT_SECRET","value":"${{ secrets.GOOGLE_CLIENT_SECRET }}"},{"name":"AWS_REGION","value":"${{ secrets.AWS_REGION }}"},{"name":"AWS_S3_BUCKET","value":"${{ secrets.AWS_S3_BUCKET }}"},{"name":"AWS_ACCESS_KEY_ID","value":"${{ secrets.AWS_ACCESS_KEY_ID }}"},{"name":"AWS_SECRET_ACCESS_KEY","value":"${{ secrets.AWS_SECRET_ACCESS_KEY }}"},{"name":"OPENROUTER_API_KEY","value":"${{ secrets.OPENROUTER_API_KEY }}"}]'
           disableTelemetry: true
+
+      - name: Show container logs (diagnostics)
+        if: always()
+        continue-on-error: true
+        run: |
+          az containerapp logs show \
+            --name ${{ env.CONTAINER_APP }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --type console --tail 50
